@@ -1,0 +1,416 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Agent Web v0.1 — Build Scope",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "net-new",
+        "label": "Net-new work",
+        "focus": [
+          "schema",
+          "catalog",
+          "commerce",
+          "returns",
+          "search"
+        ],
+        "note": "Everything that does not exist yet: schema, seeded data, commerce actions, the gated return path, and search."
+      },
+      {
+        "id": "already-built",
+        "label": "Already built",
+        "focus": [
+          "auth",
+          "triage",
+          "agentloop"
+        ],
+        "note": "Auth and triage exist and are tested; the agent loop ships with the framework."
+      },
+      {
+        "id": "gated-path",
+        "label": "Gated return path",
+        "focus": [
+          "assistant",
+          "triage",
+          "jevgate",
+          "returns",
+          "schema"
+        ],
+        "note": "The only irreversible journey: triage, policy gate, explicit confirmation, pending record."
+      },
+      {
+        "id": "surfaces",
+        "label": "UI surfaces",
+        "focus": [
+          "assistant",
+          "a2ui",
+          "mcpapps",
+          "webmcp"
+        ],
+        "note": "Assistant-first. A2UI owns constrained panels, MCP Apps owns product detail."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "assistant",
+      "type": "frontend",
+      "label": "Assistant Panel",
+      "sublabel": "primary entry point",
+      "tag": "CHANGE",
+      "pos": [
+        40,
+        250
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "a2ui",
+      "type": "frontend",
+      "label": "A2UI Surfaces",
+      "sublabel": "PLP · cart · panels",
+      "tag": "NEW · v0.9.1",
+      "pos": [
+        40,
+        110
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "mcpapps",
+      "type": "frontend",
+      "label": "MCP Apps",
+      "sublabel": "product detail",
+      "tag": "NEW",
+      "pos": [
+        40,
+        390
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "webmcp",
+      "type": "external",
+      "label": "WebMCP",
+      "sublabel": "page-local tools",
+      "tag": "NEW · silent fallback",
+      "pos": [
+        40,
+        510
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "agentloop",
+      "type": "backend",
+      "label": "Agent Loop",
+      "sublabel": "deepseek-v4.1-flash",
+      "tag": "WIRE UP",
+      "pos": [
+        280,
+        250
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "triage",
+      "type": "backend",
+      "label": "triage-message",
+      "sublabel": "intent routing",
+      "tag": "EXISTS · 7 tests",
+      "pos": [
+        280,
+        110
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "jevgate",
+      "type": "security",
+      "label": "Jev Policy Gate",
+      "sublabel": "fail closed",
+      "tag": "NEW · #2",
+      "pos": [
+        790,
+        510
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "commerce",
+      "type": "backend",
+      "label": "Commerce Actions",
+      "sublabel": "cart · product · order",
+      "tag": "NEW · 7 actions",
+      "pos": [
+        530,
+        250
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "search",
+      "type": "backend",
+      "label": "search-products",
+      "sublabel": "pgvector + Jev rerank",
+      "tag": "NEW · #3",
+      "pos": [
+        530,
+        110
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "returns",
+      "type": "backend",
+      "label": "create-return-request",
+      "sublabel": "needsApproval",
+      "tag": "NEW · gated",
+      "pos": [
+        1040,
+        510
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "schema",
+      "type": "database",
+      "label": "App Tables",
+      "sublabel": "7 tables · drizzle",
+      "tag": "NEW · blocks all",
+      "pos": [
+        790,
+        250
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "catalog",
+      "type": "database",
+      "label": "Seed + Embeddings",
+      "sublabel": "demo user · 2-3 orders",
+      "tag": "NEW",
+      "pos": [
+        790,
+        110
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "BETTER_AUTH",
+      "sublabel": "sessions · ownership",
+      "tag": "EXISTS",
+      "pos": [
+        530,
+        390
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "openrouter",
+      "type": "external",
+      "label": "OpenRouter",
+      "sublabel": "Jev · chat · embeddings",
+      "tag": "EXISTS · key set",
+      "pos": [
+        1040,
+        110
+      ],
+      "size": [
+        150,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Action layer — single authoritative operation path",
+      "wraps": [
+        "triage",
+        "agentloop",
+        "search",
+        "commerce",
+        "returns",
+        "jevgate",
+        "auth"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "Irreversible — gate + explicit confirmation",
+      "wraps": [
+        "jevgate",
+        "returns"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "assistant-loop",
+      "from": "assistant",
+      "to": "agentloop",
+      "label": "user message",
+      "variant": "emphasis"
+    },
+    {
+      "id": "loop-triage",
+      "from": "agentloop",
+      "to": "triage",
+      "label": "classify first"
+    },
+    {
+      "id": "triage-search",
+      "from": "triage",
+      "to": "search",
+      "label": "product_search"
+    },
+    {
+      "id": "triage-commerce",
+      "from": "triage",
+      "to": "commerce",
+      "label": "routes to action",
+      "variant": "emphasis",
+      "labelDx": 48
+    },
+    {
+      "id": "triage-returns",
+      "from": "triage",
+      "to": "jevgate",
+      "label": "returns_refund",
+      "variant": "security"
+    },
+    {
+      "id": "gate-returns",
+      "from": "jevgate",
+      "to": "returns",
+      "label": "approved only",
+      "variant": "security"
+    },
+    {
+      "id": "commerce-schema",
+      "from": "commerce",
+      "to": "schema",
+      "label": "SQL"
+    },
+    {
+      "id": "search-catalog",
+      "from": "search",
+      "to": "catalog",
+      "label": "vector similarity"
+    },
+    {
+      "id": "returns-schema",
+      "from": "returns",
+      "to": "schema",
+      "label": "pending record",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "auth-ownership",
+      "from": "auth",
+      "to": "commerce",
+      "label": "owner check",
+      "variant": "security"
+    },
+    {
+      "id": "a2ui-assistant",
+      "from": "a2ui",
+      "to": "assistant",
+      "variant": "dashed"
+    },
+    {
+      "id": "mcpapps-assistant",
+      "from": "mcpapps",
+      "to": "assistant",
+      "variant": "dashed"
+    },
+    {
+      "id": "webmcp-assistant",
+      "from": "webmcp",
+      "to": "assistant",
+      "variant": "dashed",
+      "fromSide": "left",
+      "toSide": "bottom"
+    },
+    {
+      "id": "catalog-openrouter",
+      "from": "catalog",
+      "to": "openrouter",
+      "label": "embed at seed",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Already exists",
+      "items": [
+        "triage-message with 7 passing tests",
+        "BETTER_AUTH sessions and middleware",
+        "Agent loop and OPENROUTER_API_KEY"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Exists, needs change",
+      "items": [
+        "Wire triage into agent-chat initialToolNames",
+        "Reroute order_modification to support-handoff (G1)",
+        "Replace scaffold system prompt and an-scaffold identity"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Net-new — build order",
+      "items": [
+        "7 app tables; blocks every action",
+        "Seed demo user, orders, product embeddings",
+        "11 new actions; search has no fallback"
+      ]
+    }
+  ]
+}
