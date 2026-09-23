@@ -4,7 +4,9 @@ Date: 2026-09-23
 
 ## Status
 
-Active
+Completed 2026-09-23. Requirements confirmed the same day; intent authority is
+now `docs/product/overview.md` (Confirmed v0.2). This memo remains as research
+and decision history only.
 
 ## Outcome
 
@@ -44,7 +46,7 @@ Out of scope:
 - Vendors' performance claims are marketing; validate with own benchmarks before adoption.
 - A2UI version inconsistency (v0.9.1 prod, v1.0 RC with differing spec): pin exact commit/schema before requirements.
 - WebMCP browser support is Origin-Trial only (Chrome 149/Edge 150); a non-WebMCP fallback is mandatory.
-- unknown "A2S": unresolved; ask user.
+- unknown "A2S": resolved 2026-09-23 as A2A-style agent protocol (optional seam, `docs/product/overview.md` §6); see Decisions below.
 - Recovery: this phase is read-only; no rollback needed beyond deleting/adjusting the memo.
 
 ## Progress
@@ -53,8 +55,8 @@ Out of scope:
 - [x] Jev scouts: ResearchPydanticJev, ResearchLangChainJev, ResearchTypeSafeOfficial.
 - [x] Write this memo.
 - [x] Requirements discussion with user (2026-09-23).
-- [x] Requirements draft in `docs/product/overview.md` (draft v0.1, pending confirmation).
-- [ ] User confirms requirements draft → move plan to `docs/plans/completed/`.
+- [x] Requirements draft in `docs/product/overview.md` (v0.1).
+- [x] User confirmed requirements scope (2026-09-23) → `docs/product/overview.md` promoted to Confirmed v0.2; plan moved to `docs/plans/completed/`.
 
 ## Framework Facts
 
@@ -172,11 +174,17 @@ Out of scope:
 - 2026-09-23: Read-only research phase; the memo is the only file written. No implementation until requirements are confirmed.
 - 2026-09-23: Treat all vendor performance claims as marketing until benchmarked.
 - 2026-09-23 (user-confirmed requirements): standalone agentic web app; e-commerce assistant domain; **agent runtime = TS only via Agent-Native (confirmed — no Python runtime; hybrid revisited only if Python-only Jev middleware becomes load-bearing)**; Node >=22.22, PostgreSQL; UI = A2UI + MCP Apps per-surface; autonomy = action layer + WebMCP page-local with mandatory fallback; Jev scope = all five targets (routing, policy gates, next-action ranking, model routing, tool-risk gating) via `@typesafe-ai/sdk` with Python middleware patterns replicated in TS; "A2S" = A2A-style agent protocol (optional seam).
-- 2026-09-23: Requirements draft written to `docs/product/overview.md` (v0.1) — pending user confirmation.
+- 2026-09-23: Requirements draft written to `docs/product/overview.md` (v0.1) — later confirmed the same day as v0.2 (see below).
 - 2026-09-23: Hybrid Python-agent spike dropped — user confirmed TS-only runtime (2026-09-23).
 - 2026-09-23: Fine tech stack defined (verified against repo trees): Agent-Native core TS-only (mandatory); A2UI agent SDKs official in TS **and** Python (`agent_sdks/python` a2ui_agent/a2ui_core); MCP-UI server official in TS/Python/Ruby (`sdks/python/mcp_ui_server`), client TS-only; WebMCP browser JS + TS polyfill; Jev TS `@typesafe-ai/sdk` and Python `typesafe-sdk` both official. Policy: TS owns actions/loop/state/sync exclusively; Python allowed only at protocol seams (action workers, A2UI emission, MCP Apps serving, Jev services), never direct `application_state` writes or unhosted UI ownership.
 
-## Open Requirement Questions (for user discussion)
+- 2026-09-23 (v0.1 scope confirmed): commerce mutations = cart direct + returns policy-gated (order modification out); A2UI pinned v0.9.1; WebMCP in scope, default-on where supported with mandatory fallback; auth = BETTER_AUTH sessions; surfaces = assistant panel + PLP + PDP + cart, one contract owner each. Recorded in `docs/product/overview.md` §9.
+- 2026-09-23: Requirements gate closed — `docs/product/overview.md` promoted from Draft v0.1 to Confirmed v0.2; plan moved to `docs/plans/completed/`.
+
+## Requirement Questions (all answered 2026-09-23 — retained as the discussion record)
+
+Answers: Q1–Q6 and Q8 are recorded in `## Decisions` above; the v0.1 scope
+resolutions are in `docs/product/overview.md` §9. None of these is still open.
 
 1. App surface: standalone agentic web app vs sidecar embedded into existing SaaS/e-commerce storefront (prior art was storefront-embedded)?
 2. UI contract: A2UI declarative native catalog vs MCP-UI/MCP Apps sandboxed HTML vs both per-surface?
@@ -192,7 +200,11 @@ Out of scope:
 - Focused proof: primary-source URLs cited per claim; vendor claims labeled.
 - Integration or end-to-end proof: not applicable (read-only phase).
 - Repository-required checks: none (no code changed).
+- Gate closure: five v0.1 scope decisions confirmed by the user 2026-09-23 and
+  recorded in `docs/product/overview.md` §9.
 
 ## Result
 
-Pending: requirements discussion → requirements draft in `docs/product/`.
+Complete. Requirements confirmed 2026-09-23; `docs/product/overview.md` is now
+the confirmed intent authority (v0.2). No product code was written in this
+phase.

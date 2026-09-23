@@ -1,8 +1,8 @@
 # Product Overview: Agentic E-Commerce Assistant (Web)
 
-Status: **Draft v0.1 — pending user confirmation.**
-Date: 2026-09-23
-Source research: `docs/plans/active/2026-09-23-agentic-web-framework-research.md`
+Status: **Confirmed v0.2 — v0.1 scope and UI contracts accepted 2026-09-23.**
+Date: 2026-09-23 (v0.1 draft → v0.2 confirmed, same day)
+Source research: `docs/plans/completed/2026-09-23-agentic-web-framework-research.md`
 
 ## 1. Purpose
 
@@ -30,7 +30,7 @@ dated and drifted.
 ### 2.1 Tech Stack: Language Dependency Map (verified 2026-09-23)
 
 | Component | TypeScript | Python | Notes |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Agent-Native core (actions, loop, state, sync) | **Mandatory** | **Not supported** | `@agent-native/core`; Node >=22.22; PostgreSQL + Drizzle |
 | A2UI host renderer | **Mandatory** | — | React/Lit/Angular web_core renderers |
 | A2UI agent-side authoring/emission | Yes (host SDKs) | **Yes — official** (`agent_sdks/python`: `a2ui_agent`, `a2ui_core`; incl. A2A/ADK tooling, v0.8/v0.9/v1.0 validators) | Both first-class |
@@ -63,6 +63,10 @@ prior art's contract drift.
   - **Mandatory fallback:** every WebMCP tool MUST have a non-WebMCP path
     (action/MCP/HTTP); WebMCP is progressive enhancement, never required.
   - Requires authorized connected browser; page-local only, not network MCP.
+  - **Confirmed 2026-09-23 — in v0.1 scope, enabled by default where
+    supported.** Support matrix: Chrome 149+ Origin Trial, Edge 150+ Origin
+    Trial. Brave Leo experimental and ChatGPT Desktop are best-effort and
+    unverified. Firefox/Safari use the fallback path only.
 - Agent context: bounded browser projection (96 KiB total / 64 KiB text /
   2,000 control nodes / 4 screenshots); use IDs/handles and incremental reads,
   never whole-page dumps. Generative inline UI if present is browser-local —
@@ -71,11 +75,12 @@ prior art's contract drift.
 ## 4. UI Contracts (both, per-surface)
 
 | Surface | Contract | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Constrained/interactive panels (forms, lists, pickers, compare) | **A2UI** | Declarative JSON stream; native-rendered; trusted component catalog only; agent stream is untrusted (sanitize, CSP). |
 | Rich/free-form views (editorial, detailed product content) | **MCP Apps** | Sandboxed `text/html;profile=mcp-app` iframe; JSON-RPC over postMessage; **origin must be verified — never `'*'` in production**; external URLs fetched server-side (SSRF risk: block private/localhost). |
 
-- **Version pinning (A2UI):** production on **v0.9.1**; v1.0 RC spec differs
+- **Version pinning (A2UI) — confirmed 2026-09-23: v0.1 targets v0.9.1.**
+  v1.0 RC is not tracked in v0.1: its spec differs
   (`callRendererFunction`/`callAgentFunction`, no `surfaceProperties`) and no
   v1 web package exists in-repo. Pin exact commit/schema; do not assume v1.
 - Surface ownership: one contract owns each surface; surfaces never mix
@@ -146,7 +151,10 @@ Performance acceptance (vendor claims are marketing until measured):
 - Jev: gate before commerce mutations with policy escalation; secrets never
   in state; API key server-side only (`OPENROUTER_API_KEY` — Jev is called
   through OpenRouter's Decisions API).
-- Auth/session model: TBD (open item) — app is standalone with sessions.
+- Auth/session model (confirmed 2026-09-23): BETTER_AUTH email/session auth,
+  already wired in `server/middleware/auth.ts`. A stable `BETTER_AUTH_SECRET`
+  is required in the deploy environment; `AUTH_DISABLED` is local/dev only and
+  MUST NOT be set in production. Anonymous shopper sessions are out of v0.1.
 - Public Agent Web / public tools: OFF by default (`publicMcp`/`expose`
   opt-in only if a public surface is ever required).
 
@@ -157,18 +165,69 @@ Performance acceptance (vendor claims are marketing until measured):
 - Jev for text generation or chat content.
 - Pricing/billing, user accounts beyond basic sessions (unless confirmed).
 
-## 9. Open Items (for confirmation)
+## 9. Confirmed v0.1 Scope (2026-09-23)
 
-1. Commerce mutation scope: cart / order / returns — which are in v0.1, and
-   approval flow for irreversible ones (policy gate + Jev + human escalation).
-2. A2UI version decision: pin v0.9.1 vs track v1.0 RC (needs v1 web package
-   availability check).
-3. Target browsers for WebMCP support matrix (which are the user's real
-   customers).
-4. Auth/session model.
-5. Initial surface inventory: which surfaces exist (PLP, PDP, cart,
-   assistant panel) and which contract owns each.
+The requirements gate is closed. Every decision below is backed by an explicit
+user selection on 2026-09-23 in response to the open items previously listed
+here; each item names its selection so the provenance is auditable. Nothing in
+this section is still open.
 
-Resolved: Jev access — via OpenRouter (`OPENROUTER_API_KEY`, model
+1. **Commerce mutations.** Cart adds/updates execute directly. Returns and
+   refunds are irreversible and MUST pass a Jev policy gate (decision service
+   #2) plus explicit user confirmation before the mutating action runs — per
+   §5, Jev never makes the final call alone on irreversible mutations. Order
+   modification is out of v0.1 scope.
+   *Selection: "Cart + returns, irreversible gated".*
+2. **A2UI version.** v0.9.1 pinned (§4); v1.0 RC is not tracked in v0.1.
+   *Selection: "Pin v0.9.1".*
+3. **WebMCP.** In scope, enabled by default where supported, with the
+   mandatory non-WebMCP fallback (§3). Support matrix: Chrome 149+ Origin
+   Trial, Edge 150+ Origin Trial.
+   *Selection: "Default-on where supported + fallback" — the support matrix is
+   part of that option's stated behavior.*
+4. **Auth/session.** BETTER_AUTH email/session auth (§7).
+   *Selection: "Keep BETTER_AUTH sessions".*
+5. **Surface inventory and contract ownership.** One contract owns each
+   surface; surfaces never mix channels mid-session (§4).
+   *Selection: all four surfaces.*
+
+| Surface | Contract owner | v0.1 |
+| --- | --- | --- |
+| Assistant panel (chat + agent-rendered panels) | A2UI for constrained panels (forms, lists, pickers, compare); MCP Apps for rich/free-form content | in scope |
+| Product list (PLP) | A2UI | in scope |
+| Product detail (PDP) | MCP Apps | in scope |
+| Cart | A2UI | in scope |
+
+Note on items 2–3: the first attempt to settle them bundled A2UI versioning and
+WebMCP into a single question. The user rejected that bundling — "i want both
+A2UI and WebMCP, because i think these is separate ability" (correct: one is a
+UI rendering contract, the other a page-local browser-tool surface) — and the
+two were then confirmed separately, as recorded above.
+
+Resolved earlier: Jev access — via OpenRouter (`OPENROUTER_API_KEY`, model
 `~typesafe/jev-latest`, `POST /api/alpha/decisions`); key provisioned and the
 live path verified 2026-09-23 (CLI + HTTP, all six intents).
+
+### Implementation-Level Decisions Still Required
+
+Below product-intent level; they do not reopen the gate. v0.1 implementation
+MUST settle each explicitly rather than assume an unwritten default:
+
+1. WebMCP behavior when the browser lacks support or is not enrolled in the
+   Origin Trial, and how the non-WebMCP fallback is selected.
+2. The rule that picks the assistant panel's contract per view between A2UI and
+   MCP Apps without mixing channels mid-session.
+3. The exact irreversible-action confirmation UX, and Jev failure/timeout
+   behavior on a gated return or refund — fail-closed is implied by §5, but the
+   user-visible path is unspecified.
+4. Session persistence and local database defaults (PGlite is development-only,
+   per the doctor check).
+
+### Environment And Repo Debt (outside this gate)
+
+Does not change product intent, and none of it blocks implementation start:
+deployment environment values (`BETTER_AUTH_SECRET`, a persistent
+`DATABASE_URL`); repo identity (`package.json` still carries the `an-scaffold`
+template name, and `netlify.toml` still lists template origins); and broken
+documentation-map entries in `docs/README.md` — `ARCHITECTURE.md`, `HARNESS.md`,
+and `crates/` do not exist in this repository.
