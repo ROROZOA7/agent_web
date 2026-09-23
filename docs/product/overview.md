@@ -3,6 +3,10 @@
 Status: **Confirmed v0.2 — v0.1 scope and UI contracts accepted 2026-09-23.**
 Date: 2026-09-23 (v0.1 draft → v0.2 confirmed, same day)
 Source research: `docs/plans/completed/2026-09-23-agentic-web-framework-research.md`
+Implementation detail: `docs/product/v0.1-build-definition.md` (Confirmed)
+
+This document owns strategic scope. What to build, and how its behavior is
+observed, lives in the build definition; it must stay consistent with this one.
 
 ## 1. Purpose
 
@@ -208,20 +212,26 @@ Resolved earlier: Jev access — via OpenRouter (`OPENROUTER_API_KEY`, model
 `~typesafe/jev-latest`, `POST /api/alpha/decisions`); key provisioned and the
 live path verified 2026-09-23 (CLI + HTTP, all six intents).
 
-### Implementation-Level Decisions Still Required
+### Implementation-Level Decisions (all settled 2026-09-23)
 
-Below product-intent level; they do not reopen the gate. v0.1 implementation
-MUST settle each explicitly rather than assume an unwritten default:
+Below product-intent level; they never reopened the gate. All four are now
+resolved in `v0.1-build-definition.md` (Confirmed), which is authoritative for
+implementation detail:
 
-1. WebMCP behavior when the browser lacks support or is not enrolled in the
-   Origin Trial, and how the non-WebMCP fallback is selected.
-2. The rule that picks the assistant panel's contract per view between A2UI and
-   MCP Apps without mixing channels mid-session.
-3. The exact irreversible-action confirmation UX, and Jev failure/timeout
-   behavior on a gated return or refund — fail-closed is implied by §5, but the
-   user-visible path is unspecified.
-4. Session persistence and local database defaults (PGlite is development-only,
-   per the doctor check).
+1. WebMCP behavior when unsupported or not enrolled in the Origin Trial:
+   silent fallback to the action layer with no user-visible difference,
+   detected at runtime. Build definition §10.
+2. The rule picking the assistant panel's contract per view: a static per-view
+   mapping — product detail through MCP Apps, every other view through A2UI.
+   Build definition §11 G6.
+3. Irreversible-action confirmation and Jev failure/timeout on a gated return:
+   fail closed, create no record, state the failure plainly, and offer support
+   escalation. No automatic retry, because §5 records that Jev re-asks usually
+   return the same answer. Build definition §10.
+4. Session persistence and local database defaults: inherit framework defaults.
+   Sessions are owned by `createAuthPlugin`; local development persists to
+   PGlite under `data/`, and production requires a persistent `DATABASE_URL`.
+   Build definition §10.
 
 ### Environment And Repo Debt (outside this gate)
 
